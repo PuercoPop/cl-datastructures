@@ -36,10 +36,19 @@
   ((head :initarg :head :initform nil)
    (tail :initarg :tail :initform nil)))
 
+;; Don't want the <STACK ... (obj address)> clutter in thi case
+;; (defmethod print-object ((obj stack) stream)
+;;   "In order to help checking the results"
+;;   (print-unreadable-object (obj stream :type t :identity t)
+;;     (with-slots (head tail) obj
+;;       (format stream "(~A, ~A)" head tail))))
+
 (defmethod print-object ((obj stack) stream)
-  (print-unreadable-object (obj stream :type t :identity t)
-    (with-slots (head tail) obj
-      (format stream "<~A,~A>" head tail))))
+  "In order to help checking the results"
+  (with-slots (head tail) obj
+    (format stream "(~A, ~A)"
+            head
+            tail)))
 
 (defmethod empty ((stack stack))
   '())
@@ -54,8 +63,9 @@
         t
         nil)))
 
-(defmethod new-stack (head (tail stack))
+(defmethod new-stack (head tail)
   (make-instance 'stack :head head :tail tail))
+
 
 (defmethod head ((stack stack))
   (with-slots (head) stack
@@ -87,12 +97,19 @@
 ;;; Exercise 2.1
 
 (defmethod suffixes ((stack stack))
-  (cond ((empty-p stack) (new-stack stack (make-instance 'stack)))
+  (cond ((empty-p stack) stack)
         (t (new-stack stack (suffixes (tail stack))))))
 
+(trace suffixes)
 (suffixes (new-stack 3 (new-stack 1 (new-stack 2 (make-instance 'stack)))))
+(new-stack 3 (new-stack 1 (new-stack 2 nil)))
+(transverse-stack (new-stack 3 (new-stack 1 (new-stack 2 (make-instance 'stack)))))
 
-(tree-equal (new-stack 1 (new-stack 2 (make-instance 'stack)))
-            (new-stack 1 (new-stack 2 (make-instance 'stack))))
 
-;; #<STACK <#<STACK <1,#1=#<STACK <2,#2=#<STACK <NIL,NIL> {1006A315B3}>> {1006A31603}>> {1006A31653}>,#<STACK <#1#,#<STACK <#2#,#<STACK <NIL,NIL> {1006A316A3}>> {1006A316E3}>> {1006A31723}>> {1006A31763}>
+(equal (new-stack 1 (new-stack 2 (make-instance 'stack)))
+       (new-stack 1 (new-stack 2 (make-instance 'stack))))
+
+(defmethod transverse-stack ((stack stack))
+  (cond ((empty-p stack) (format t "~A~%" stack))
+        (t (format t "~A~%" stack)
+           (transverse-stack (tail stack)))))
