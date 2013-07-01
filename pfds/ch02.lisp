@@ -32,20 +32,16 @@
 
 ;;; Implementation
 
-(defclass empty-stack (stack)
-  ())
+(defparameter +empty-stack+ (make-instance 'stack))
 
-(defmethod print-object ((obj empty-stack) stream)
-  "In order to help checking the results"
-  (format stream "Ø"))
 
-(defmethod empty-p ((stack empty-stack))
+(defmethod empty-p ((stack (eql +empty-stack+)))
   t)
 
-(defmethod head ((stack empty-stack))
+(defmethod head ((stack (eql +empty-stack+)))
   (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
 
-(defmethod tail ((stack empty-stack))
+(defmethod tail ((stack (eql +empty-stack+)))
   (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
 
 
@@ -58,11 +54,6 @@
   "In order to help checking the results"
   (with-slots (head tail) obj
     (format stream "(~A, ~A)" head tail)))
-
-(defmethod equal ((master stack) (candidate stack))
-  (cond ((empty)))
-  )
-(defgeneric equal ((stack stack) (stack stack)))
 
 
 (defmethod empty-p ((stack stack))
@@ -96,6 +87,9 @@
                       (update (tail stack) (- index 1) value)))))
 
 
+(defmethod print-object ((obj (eql +empty-stack+)) stream)
+  "In order to help checking the results"
+  (format stream "Ø"))
 ;;; Exercise 2.1
 
 (defmethod suffixes ((stack stack))
