@@ -32,17 +32,7 @@
 
 ;;; Implementation
 
-(defparameter +empty-stack+ (make-instance 'stack))
 
-
-(defmethod empty-p ((stack (eql +empty-stack+)))
-  t)
-
-(defmethod head ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
-
-(defmethod tail ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
 
 
 ;;; Stack
@@ -76,9 +66,6 @@
    (head left-stack)
    (merge-stacks (tail left-stack) right-stack)))
 
-(defmethod merge-stacks ((left-stack empty-stack) (right-stack stack))
-   right-stack)
-
 (defmethod update ((stack stack) index value)
   (cond ((empty-p stack) (error 'invalid-subscript
                                 :text "Out of bounds error. List not that long."))
@@ -87,9 +74,26 @@
                       (update (tail stack) (- index 1) value)))))
 
 
+(defparameter +empty-stack+ (make-instance 'stack))
+
 (defmethod print-object ((obj (eql +empty-stack+)) stream)
   "In order to help checking the results"
   (format stream "Ø"))
+
+(defmethod empty-p ((stack (eql +empty-stack+)))
+  t)
+
+(defmethod head ((stack (eql +empty-stack+)))
+  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
+
+(defmethod tail ((stack (eql +empty-stack+)))
+  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
+
+(defmethod merge-stacks ((left-stack (eql +empty-stack+)) (right-stack stack))
+   right-stack)
+
+
+
 ;;; Exercise 2.1
 
 (defmethod suffixes ((stack stack))
