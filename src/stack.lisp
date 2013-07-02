@@ -36,14 +36,14 @@
 
 
 ;;; Stack
+
 (defclass stack ()
-  ((head :initarg :head :initform nil)
-   (tail :initarg :tail :initform nil)))
+  ((head :initarg :head :initform nil :reader head)
+   (tail :initarg :tail :initform nil :reader tail)))
 
 (defmethod print-object ((obj stack) stream)
-  "In order to help checking the results"
-  (with-slots (head tail) obj
-    (format stream "(~A, ~A)" head tail)))
+  "In order to help checking the results."
+  (format stream "(~A, ~A)" (head obj) (tail obj)))
 
 
 (defmethod empty-p ((stack stack))
@@ -52,14 +52,6 @@
 (defmethod new-stack (head tail)
   (make-instance 'stack :head head :tail tail))
 
-
-(defmethod head ((stack stack))
-  (with-slots (head) stack
-    head))
-
-(defmethod tail ((stack stack))
-  (with-slots (tail) stack
-    tail))
 
 (defmethod merge-stacks ((left-stack stack) (right-stack stack))
   (new-stack
