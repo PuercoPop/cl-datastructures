@@ -4,4 +4,6 @@
   (:use :cl)
   (:export
    #:merge-stacks
-   #:update))
+   #:update
+   #:+empty-stack+
+   #:new-stack))
