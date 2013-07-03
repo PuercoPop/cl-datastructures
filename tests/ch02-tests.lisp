@@ -36,4 +36,8 @@
 ;; (print-object +empty-stack+ t)
 
 
+
 ;; (insert 3 (make-instance 'zet :element 3))
+
+(defun runner ()
+  (run! 'ch02))

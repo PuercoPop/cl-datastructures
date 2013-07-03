@@ -1,4 +1,7 @@
 (in-package :cl)
 
 (defpackage :pfds
-  (:use :cl))
+  (:use :cl)
+  (:export
+   #:merge-stacks
+   #:update))
