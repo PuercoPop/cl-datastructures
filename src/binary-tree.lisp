@@ -1,24 +1,30 @@
 (in-package :pfds)
 
-;;; Ordered
+;; Ordered
 
-(defgeneric == (first second)
-  (:documentation "t if first and second are equal, nil otherwise."))
+(defgeneric ord-eql (pattern candidate)
+  (:documentation "Is pattern equal to candidate?"))
 
-(defgeneric less-than (first second)
-  (:documentation "Returns t if the first object comes before the second one in a given order."))
+(defgeneric ord-lt (pattern candidate)
+  (:documentation "Is the pattern less than candidate?"))
 
-(defgeneric more-than (first second)
-  (:documentation "Returns t if the second object comes before the first one in a given order."))
+(defgeneric ord-leq (pattern candidate)
+  (:documentation "Is the pattern less or equal than the candidate?"))
 
-(defmethod == ((first integer) (second integer))
-  (eql first second))
+;; Ordered for integers
 
-(defmethod less-than ((first integer) (second integer))
-  (< first second))
+(defmethod ord-eql ((pattern fixnum) (candidate fixnum))
+  (eq pattern candidate))
 
-(defmethod more-than ((first integer) (second integer))
-  (> first second))
+(defmethod ord-lt ((pattern fixnum) (candidate fixnum))
+  (< pattern candidate))
+
+(defmethod ord-leq ((pattern fixnum) (candidate fixnum))
+  (<= pattern candidate))
+
+
+
+
 
 ;;; Nodes
 
