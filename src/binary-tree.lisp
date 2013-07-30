@@ -88,7 +88,13 @@
 
 (defun new-node (value &key (left +empty-node+)
                          (right +empty-node+))
-  "Create a new node, either a branch or a leaf."
+  "Properly construct a new node."
+
+  (unless (typep left 'node)
+    (setf left (new-node left)))
+  (unless (typep right 'node)
+    (seff right (new-node right)))
+
   (make-instance 'node
                  :element value
                  :left left
@@ -113,12 +119,11 @@ when the list is of length 3 or less."
                                   :left (first r-values)))
                        ((= length 1)
                         (new-node (first r-values)))
-                       (t (make-instance 'node
-                                         :element (nth median r-values)
-                                         :left (r-helper 
-                                                (subseq r-values 0 median))
-                                         :right (r-helper
-                                                 (subseq r-values (1+ median)))) )))))
+                       (t (new-node (nth median r-values)
+                                    :left (r-helper 
+                                           (subseq r-values 0 median))
+                                    :right (r-helper
+                                            (subseq r-values (1+ median)))) )))))
       (r-helper values))))
 
 (defmethod print-object ((obj (eql +empty-node+)) stream)
