@@ -136,20 +136,48 @@ when the list is of length 3 or less."
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
   "Write graphivz's dot file for the tree."
   ;; If specify root to both branch. If node is not +empty-nodenode+ recur.
-  (with-open-file (output output-file
+  (swank::eval-in-emacs `(shell-command ,(format nil "rm ~A" (namestring output-file))))
+  (let* ((output-emacs-file (namestring output-file))
+         (output-img-file (format nil "~A-~A" output-emacs-file (gensym))))
+    (with-open-file (output output-file
                             :direction :output)
       (format output "digraph{~%")
       (labels ((recur (node)
-             (with-accessors ((val element)
-                              (left left-branch)
-                              (right right-branch)) node
-               (let ((left-element (element left))
-                     (right-element (element right)))
-                 (format output "~A -> ~A~%" val left-element)
-                 (format output "~A -> ~A~%" val right-element)
-                 (when left-element
-                   (recur left))
-                 (when right-element
-                   (recur right))))))
+                 (with-accessors ((val element)
+                                  (left left-branch)
+                                  (right right-branch)) node
+                   (let ((left-element (element left))
+                         (right-element (element right)))
+                     (format output "~A -> ~A~%" val left-element)
+                     (format output "~A -> ~A~%" val right-element)
+                     (when left-element
+                       (recur left))
+                     (when right-element
+                       (recur right))))))
         (recur root))
-      (format output "}")))
+      (format output "}"))
+    (swank::eval-in-emacs
+     `(progn
+        (shell-command ,(format nil "dot ~A -Tpng > ~A"
+                                output-emacs-file
+                                output-img-file))
+        (find-file ,output-img-file)
+        t))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
