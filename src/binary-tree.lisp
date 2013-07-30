@@ -37,7 +37,7 @@
 (defgeneric insert (element tree)
   (:documentation "Returns a new set with the element inside."))
 
-(defgeneric member? (element tree &optional candidate)
+(defgeneric member? (element tree)
   (:documentation "Returns a new set with the element inside."))
 
 (defgeneric insert (element tree)
@@ -49,7 +49,7 @@
    (right-branch :initarg :right :initform nil :reader right-branch)))
 
 
-(defmethod member? (element (node branch) &optional candidate)
+(defmethod member? (element (node node))
   (cond
     ((ord-lt element (element node))
      (member? element (left-branch node) candidate))
@@ -57,7 +57,7 @@
      (member element (right-branch node)))
     (t t))) ; (t (member? element (right-branch node) node))
 
-(defmethod insert (element (node branch))
+(defmethod insert (element (node node))
   (cond
     ((ord-lt element (element node))
      (make-instance 'node
@@ -71,11 +71,6 @@
                     :right (insert element (right-branch node))))
     (t node)))
 
-(defmethod member? (element (node leaf) &optional candidate)
-  (cond ((eql element (element node)) t)
-        ((and (not (null candidate)) (eql element (element candidate))) t)
-        (t nil)))
-
 ;; Empty node is just an specialization of node.
 
 (defparameter +empty-node+ (make-instance 'node))
@@ -88,6 +83,25 @@
 
 (defmethod insert (element (node (eql +empty-node+)))
   (make-instance 'node :element element :left +empty-node+ :right +empty-node+))
+
+;; Constructos & helpers
+
+(defun new-node (value &key (left +empty-node+ left-p)
+                            (right +empty-node+ right-p))
+  "Create a new node, either a branch or a leaf."
+  (if (or left-p right-p)
+      (make-instance 'branch
+                     :element value
+                     :left left :right right)
+      (make-instance 'leaf
+                     :element value)))
+
+(defun binary-tree (&rest values)
+  "Eliminate duplicates. Sort the list. Take the median as the Root, and the
+left branch the result of the recursively applying the same procedure on the
+elements less than the mean and viceversa for the right branch. The base case
+when the list is of length 3 or less."
+  (sort (remove-duplicates values) #'<))
 
 (defmethod print-object ((obj (eql +empty-node+)) stream)
   "In order to help checking the results"
