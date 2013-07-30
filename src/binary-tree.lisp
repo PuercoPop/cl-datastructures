@@ -93,7 +93,7 @@
   (unless (typep left 'node)
     (setf left (new-node left)))
   (unless (typep right 'node)
-    (seff right (new-node right)))
+    (setf right (new-node right)))
 
   (make-instance 'node
                  :element value
@@ -129,3 +129,27 @@ when the list is of length 3 or less."
 (defmethod print-object ((obj (eql +empty-node+)) stream)
   "In order to help checking the results"
   (format stream "Ø"))
+
+;; (defmethod element ((node (eql +empty-node+)))
+;;   "Ø")
+
+(defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
+  "Write graphivz's dot file for the tree."
+  ;; If specify root to both branch. If node is not +empty-nodenode+ recur.
+  (with-open-file (output output-file
+                            :direction :output)
+      (format output "digraph{~%")
+      (labels ((recur (node)
+             (with-accessors ((val element)
+                              (left left-branch)
+                              (right right-branch)) node
+               (let ((left-element (element left))
+                     (right-element (element right)))
+                 (format output "~A -> ~A~%" val left-element)
+                 (format output "~A -> ~A~%" val right-element)
+                 (when left-element
+                   (recur left))
+                 (when right-element
+                   (recur right))))))
+        (recur root))
+      (format output "}")))
