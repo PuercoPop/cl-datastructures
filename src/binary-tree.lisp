@@ -14,10 +14,10 @@
 ;; Defining general methods on top of the specific ones.
 
 (defmethod ord-neql (pattern candidate)
-  (not (orld-eql pattern candidate)))
+  (not (ord-eql pattern candidate)))
 
 (defmethod ord-gt (pattern candidate)
-  (not (orld-leq pattern candidate)))
+  (not (ord-leq pattern candidate)))
 
 ;; Ordered for integers
 
@@ -52,7 +52,7 @@
 (defmethod member? (element (node node))
   (cond
     ((ord-lt element (element node))
-     (member? element (left-branch node) candidate))
+     (member? element (left-branch node)))
     ((ord-gt element (element node))
      (member element (right-branch node)))
     (t t))) ; (t (member? element (right-branch node) node))
@@ -86,22 +86,40 @@
 
 ;; Constructos & helpers
 
-(defun new-node (value &key (left +empty-node+ left-p)
-                            (right +empty-node+ right-p))
+(defun new-node (value &key (left +empty-node+)
+                         (right +empty-node+))
   "Create a new node, either a branch or a leaf."
-  (if (or left-p right-p)
-      (make-instance 'branch
-                     :element value
-                     :left left :right right)
-      (make-instance 'leaf
-                     :element value)))
+  (make-instance 'node
+                 :element value
+                 :left left
+                 :right right))
 
 (defun binary-tree (&rest values)
   "Eliminate duplicates. Sort the list. Take the median as the Root, and the
 left branch the result of the recursively applying the same procedure on the
 elements less than the mean and viceversa for the right branch. The base case
 when the list is of length 3 or less."
-  (sort (remove-duplicates values) #'<))
+  (let ((values (sort (remove-duplicates values) #'<)))
+    (labels ((r-helper (&rest r-values)
+               (let* ((r-values (apply #'append r-values)) ; Nested rest needs to be spliced
+                      (length (length r-values))
+                      (median (floor (/ length 2))))
+                 (cond ((= length 3)
+                        (new-node (second r-values)
+                                  :left (first r-values)
+                                  :right (third r-values)))
+                       ((= length 2)
+                        (new-node (second r-values)
+                                  :left (first r-values)))
+                       ((= length 1)
+                        (new-node (first r-values)))
+                       (t (make-instance 'node
+                                         :element (nth median r-values)
+                                         :left (r-helper 
+                                                (subseq r-values 0 median))
+                                         :right (r-helper
+                                                 (subseq r-values (1+ median)))) )))))
+      (r-helper values))))
 
 (defmethod print-object ((obj (eql +empty-node+)) stream)
   "In order to help checking the results"
