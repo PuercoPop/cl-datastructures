@@ -9,5 +9,6 @@
   :license "<3"
   :pathname "src/"
   :components ((:file "packages")
+               (:file "utils")
                (:file "stack")
                (:file "binary-tree")))

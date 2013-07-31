@@ -37,7 +37,7 @@
 (defgeneric insert (element tree)
   (:documentation "Returns a new set with the element inside."))
 
-(defgeneric member? (element tree)
+(defgeneric member? (element tree &optional candidate)
   (:documentation "Returns a new set with the element inside."))
 
 (defgeneric insert (element tree)
@@ -49,11 +49,10 @@
    (right-branch :initarg :right :initform nil :reader right-branch)))
 
 
-(defmethod member? (element (node node))
-  (cond
-    ((ord-lt element (element node)) (member? element (left-branch node)))
-    ((ord-gt element (element node)) (member? element (right-branch node)))
-    (t t)))
+(defmethod member? (element (node node) &optional candidate)
+  (if (ord-leq element (element node))
+      (member? element (left-branch node) (element node))
+      (member? element (right-branch node) candidate)))
 
 
 (defmethod insert (element (node node))
@@ -77,8 +76,10 @@
 (defmethod empty? ((node (eql +empty-node+)))
   t)
 
-(defmethod member? (element (node (eql +empty-node+)))
-  nil)
+(defmethod member? (element (node (eql +empty-node+)) &optional candidate)
+  (if candidate
+    (ord-eql candidate element)
+    nil))
 
 (defmethod insert (element (node (eql +empty-node+)))
   (make-instance 'node :element element :left +empty-node+ :right +empty-node+))
@@ -119,7 +120,7 @@ when the list is of length 3 or less."
                        ((= length 1)
                         (new-node (first r-values)))
                        (t (new-node (nth median r-values)
-                                    :left (r-helper 
+                                    :left (r-helper
                                            (subseq r-values 0 median))
                                     :right (r-helper
                                             (subseq r-values (1+ median)))) )))))
@@ -132,6 +133,7 @@ when the list is of length 3 or less."
 ;; (defmethod element ((node (eql +empty-node+)))
 ;;   "Ø")
 
+#+sbcl
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
   "Write graphivz's dot file for the tree."
   ;; If specify root to both branch. If node is not +empty-nodenode+ recur.
@@ -162,3 +164,5 @@ when the list is of length 3 or less."
                                 output-img-file))
         (find-file ,output-img-file)
         t))))
+
+;; (member 4 (binary-tree 3 2 0 6 4))
