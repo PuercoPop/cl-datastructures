@@ -51,11 +51,10 @@
 
 (defmethod member? (element (node node))
   (cond
-    ((ord-lt element (element node))
-     (member? element (left-branch node)))
-    ((ord-gt element (element node))
-     (member element (right-branch node)))
-    (t t))) ; (t (member? element (right-branch node) node))
+    ((ord-lt element (element node)) (member? element (left-branch node)))
+    ((ord-gt element (element node)) (member? element (right-branch node)))
+    (t t)))
+
 
 (defmethod insert (element (node node))
   (cond
@@ -136,11 +135,11 @@ when the list is of length 3 or less."
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
   "Write graphivz's dot file for the tree."
   ;; If specify root to both branch. If node is not +empty-nodenode+ recur.
-  (swank::eval-in-emacs `(shell-command ,(format nil "rm ~A" (namestring output-file))))
   (let* ((output-emacs-file (namestring output-file))
          (output-img-file (format nil "~A-~A" output-emacs-file (gensym))))
     (with-open-file (output output-file
-                            :direction :output)
+                            :direction :output
+                            :if-exists :supersede)
       (format output "digraph{~%")
       (labels ((recur (node)
                  (with-accessors ((val element)
@@ -148,11 +147,11 @@ when the list is of length 3 or less."
                                   (right right-branch)) node
                    (let ((left-element (element left))
                          (right-element (element right)))
-                     (format output "~A -> ~A~%" val left-element)
-                     (format output "~A -> ~A~%" val right-element)
                      (when left-element
+                       (format output "~A -> ~A~%" val left-element)
                        (recur left))
                      (when right-element
+                       (format output "~A -> ~A~%" val right-element)
                        (recur right))))))
         (recur root))
       (format output "}"))
@@ -163,21 +162,3 @@ when the list is of length 3 or less."
                                 output-img-file))
         (find-file ,output-img-file)
         t))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
