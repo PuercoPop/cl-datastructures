@@ -37,6 +37,9 @@
 (defgeneric insert (element tree)
   (:documentation "Returns a new set with the element inside."))
 
+(defgeneric %insert (element tree)
+  (:documentation ""))
+
 (defgeneric member? (element tree &optional candidate)
   (:documentation "Returns a new set with the element inside."))
 
@@ -56,25 +59,12 @@
       (member? element (right-branch node) candidate)))
 
 
-(define-condition element-already-present (error)
-  ((text :initarg :text :reader text)))
-
-(defmethod insert :around (element (node node))
-  "Wrap the function call around a catch statement so to prevent unnecesary
-copying when element already belongs in the tree. When run for the first time,
-setup handler case of the element already present."
-  (cond ((not (boundp 'first-call))
-         (handler-case
-             (progn
-               (let ((first-call t)
-                     (result (call-next-method)))
-                 (declare (ignore first-call))
-                 result))
-           (element-already-present () node)))
-        (t (let ((result (call-next-method)))
-             result))))
-
 (defmethod insert (element (node node))
+  (aif (%insert element node)
+      it
+      node))
+
+(defmethod %insert (element (node node))
   (cond
     ((ord-lt element (element node))
      (make-instance 'node
@@ -87,7 +77,7 @@ setup handler case of the element already present."
                     :element (element node)
                     :right (insert element (right-branch node))))
     ((ord-eql element (element node))
-     (error 'element-already-present :text "Don't copy in vain."))
+     nil)
     (t node)))
 
 ;; Empty node is just an specialization of node.
