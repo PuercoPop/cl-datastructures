@@ -11,5 +11,7 @@
   :depends-on (#:anaphora)
   :components ((:file "packages")
                (:file "utils")
+               (:file "ordered")
                (:file "stack")
-               (:file "binary-tree")))
+               (:file "binary-tree")
+               (:file "heap")))
