@@ -116,7 +116,7 @@ when the list is of length 3 or less."
 #+sbcl
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
   "Write graphivz's dot file for the tree."
-  ;; If specify root to both branch. If node is not +empty-nodenode+ recur.
+  ;; If specify root to both branch. If node is not +empty-node+ recur.
   (let* ((output-emacs-file (namestring output-file))
          (output-img-file (format nil "~A-~A" output-emacs-file (gensym))))
     (with-open-file (output output-file
