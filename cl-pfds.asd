@@ -14,4 +14,4 @@
                (:file "ordered")
                (:file "stack")
                (:file "binary-tree")
-               (:file "heap")))
+               (:file "leftist-heap")))
