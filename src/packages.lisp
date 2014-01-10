@@ -49,3 +49,10 @@
    #:rank
    #:leftist-node
    #:+empty-heap+))
+
+(defpackage :red-black-tree
+  (:use :cl :binary-tree :ordered)
+  (:export
+   #:color
+   #:balance
+   #:+empty-node+))
