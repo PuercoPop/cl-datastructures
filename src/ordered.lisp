@@ -1,4 +1,4 @@
-(in-package :pfds)
+(in-package :ordered)
 
 ;; So as to not make all the datastructures depend on integers a
 ;; mininal interface, Ordered, is used, as show in page 14.

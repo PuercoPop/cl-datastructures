@@ -1,5 +1,4 @@
-(in-package :pfds)
-
+(in-package :binary-tree)
 
 ;; Nodes
 
@@ -64,7 +63,7 @@
 (defmethod insert (element (node (eql +empty-node+)))
   (make-instance 'node :element element :left +empty-node+ :right +empty-node+))
 
-;; Constructos & helpers
+;; Constructors & helpers
 
 (defun new-node (value &key (left +empty-node+)
                          (right +empty-node+))

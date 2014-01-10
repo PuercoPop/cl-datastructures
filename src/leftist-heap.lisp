@@ -1,11 +1,5 @@
-(in-package :pfds)
+(in-package :leftist-heap)
 
-
-(defgeneric is-empty (heap)
-  (:documentation "Is the heap empty?"))
-
-(defgeneric insert (value heap)
-  (:documentation "insert the value on the heap and return the heap."))
 
 (defgeneric merge-leftist-node (heap-a heap-b)
   (:documentation "Takes to heaps and returned the merged heap."))
@@ -17,8 +11,11 @@
   (:documentation "Delete the minium element of the heap, raises Empty exception if empty."))
 
 (defgeneric rank (node)
+  (:documentation "The length of the rightmost path to an empty node."))
+
+(defgeneric s-value (node)
   (:documentation "Calcuate the S-value of the node, which is the
-  minimum distance to a leaf (empty-node). Memoziation."))
+  minimum distance to a leaf (empty-node)."))
 
 (defgeneric check-invariants (heap)
   (:documentation "Check the invariants of data structures."))
@@ -27,7 +24,8 @@
 ;; Implementaton
 
 (defclass leftist-node (node)
-  ((rank :documentation "The distance to a childless node (empty node).")))
+  ((rank :documentation "The distance to a childless node (empty node).")
+   (s-value)))
 
 (defparameter +empty-heap+ (make-instance 'leftist-node)
   "The node to represent the empty leftist binary heap.")
@@ -35,16 +33,18 @@
 (define-condition empty-heap-conditon (error)
   ((text :initarg :text :reader :text)))
 
-(defmethod is-empty ((heap leftist-node))
+(defmethod empty? ((heap leftist-node))
   nil)
 
-(defmethod is-empty ((heap (eql +empty-heap+)))
+(defmethod empty? ((heap (eql +empty-heap+)))
   t)
 
-(defmethod merge-leftist-node ((heap-a leftist-node) (heap-b (eql +empty-heap+)))
+(defmethod merge-leftist-node ((heap-a leftist-node)
+                               (heap-b (eql +empty-heap+)))
   heap-a)
 
-(defmethod merge-leftist-node ((heap-a (eql +empty-heap+)) (heap-b leftist-node))
+(defmethod merge-leftist-node ((heap-a (eql +empty-heap+))
+                               (heap-b leftist-node))
   heap-b)
 
 (defmethod merge-leftist-node ((heap-a leftist-node) (heap-b leftist-node))
@@ -58,9 +58,8 @@
                         :right (merge-leftist-node heap-a
                                                    (right-branch heap-b)))))
 
-(defun new-leftist-node (value &key (left +empty-heap+)
-                                 (right +empty-heap+))
-  "Ensures that the node is initialized with the proper rank."
+(defun new-leftist-node (value &key (left +empty-heap+) (right +empty-heap+))
+  "Ensures the node with the higher rank is put on the left spine."
   (if (>= (rank left) (rank right))
       (make-instance 'leftist-node
                      :element value
@@ -94,9 +93,9 @@
   (print-unreadable-object (node stream :type t :identity nil)
     (princ (element node) stream)))
 
+
 (defmethod rank ((node leftist-node))
-  (1+ (min (rank (left-branch node))
-           (rank  (right-branch node)))))
+  (1+ (rank (right-branch node))))
 
 (defmethod rank ((node (eql +empty-heap+)))
   0)
@@ -105,6 +104,18 @@
   (if (slot-boundp node 'rank)
       (slot-value node 'rank)
       (setf (slot-value node 'rank) (call-next-method))))
+
+(defmethod s-value ((node leftist-node))
+  (1+ (min (s-value (left-branch node))
+           (s-value  (right-branch node)))))
+
+(defmethod s-value ((node (eql +empty-heap+)))
+  0)
+
+(defmethod s-value :around ((node leftist-node))
+  (if (slot-boundp node 's-value)
+      (slot-value node 's-value)
+      (setf (slot-value node 's-value) (call-next-method))))
 
 (defmethod check-invariants ((node leftist-node))
   "The path to a leaf is shorter when transversing the right branch
