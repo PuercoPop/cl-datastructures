@@ -8,7 +8,8 @@
   :serial t
   :license "<3"
   :pathname "src/"
-  :depends-on (#:anaphora)
+  :depends-on (#:anaphora
+               #:quid-pro-quo)
   :components ((:file "packages")
                (:file "utils")
                (:file "ordered")

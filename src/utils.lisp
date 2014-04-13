@@ -1,4 +1,10 @@
-(in-package :pfds)
+(in-package :pfds-utils)
+
+(define-condition argument-required (error)
+  ((argument-name :initarg :argument-name :reader argument-name))
+  (:report
+   (lambda (condition stream)
+     (format stream "Argument ~A is required." (argument-name condition)))))
 
 (defun make-counter ()
   "Complete useless, SBCL has its own profiler and instrumentation."

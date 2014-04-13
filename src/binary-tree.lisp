@@ -15,10 +15,14 @@
   (:documentation "Return a new tree, with the element inserted. If the node already exists then return the same there."))
 
 
+(defparameter +empty-node+ 'empty-node)
+
 (defclass node ()
-  ((element :initarg :element :initform nil :reader element)
-   (left-branch :initarg :left :initform nil :reader left-branch)
-   (right-branch :initarg :right :initform nil :reader right-branch)))
+  ((element :initarg :element
+            :initform (error 'argument-required :argument-name 'element)
+            :reader element)
+   (left-branch :initarg :left :initform +empty-node+ :reader left-branch)
+   (right-branch :initarg :right :initform +empty-node+ :reader right-branch)))
 
 
 (defmethod member? (element (node node) &optional candidate)
@@ -29,8 +33,8 @@
 
 (defmethod insert (element (node node))
   (aif (%insert element node)
-       it
-       node))
+      it
+    node))
 
 (defmethod %insert (element (node node))
   (cond
@@ -47,10 +51,6 @@
     ((ord-eql element (element node))
      nil)
     (t node)))
-
-;; Empty node is just an specialization of node.
-
-(defparameter +empty-node+ (make-instance 'node))
 
 (defmethod empty? ((node (eql +empty-node+)))
   t)
@@ -69,9 +69,9 @@
                          (right +empty-node+))
   "Properly construct a new node."
 
-  (unless (typep left 'node)
+  (unless (eql left +empty-node+)
     (setf left (new-node left)))
-  (unless (typep right 'node)
+  (unless (eql right +empty-node+)
     (setf right (new-node right)))
 
   (make-instance 'node
