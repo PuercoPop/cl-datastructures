@@ -16,3 +16,18 @@
                (:file "stack")
                (:file "binary-tree")
                (:file "leftist-heap")))
+
+(asdf:defsystem #:cl-pfds-tests
+  :depends-on (#:cl-pfds
+               #:fiveam)
+  :serial t
+  :pathname "tests/"
+  :components ((:file "packages")
+               (:file "ch02-tests")
+               (:file "binary-tree")
+               (:file "runner")))
+
+(defmethod asdf:perform ((op asdf:test-op)
+                         (system (eql (asdf:find-system :cl-pfds))))
+  (asdf:load-system :cl-pfds-tests)
+  (asdf/package:symbol-call :cl-pfds 'runner))

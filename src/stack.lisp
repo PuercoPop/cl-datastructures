@@ -1,9 +1,12 @@
-(in-package :pfds)
+(in-package :stack)
 
 ;;; Interface
 
-;; (defgeneric empty (stack)
-;;   (:documentation "Return an empty stack."))
+(defparameter +empty-stack+ 'empty-stack)
+
+(defmethod print-object ((obj (eql 'empty-stack)) stream)
+  "In order to help checking the results"
+  (format stream "Ø"))
 
 (defgeneric empty-p (stack)
   (:documentation "True if stack is empty."))
@@ -18,28 +21,30 @@
   (:documentation "Return the tail of the stack, raise empty if stack is empty."))
 
 (defgeneric merge-stacks (left-stack right-stack)
-  (:documentation "Return a new stack which contains the elements of both stacks."))
+  (:documentation "Return a new stack which contains the elements of both
+  stacks."))
 
 (defgeneric update (stack index value)
-  (:documentation "Return a new stack which has the value at the index position substituting the old value."))
+  (:documentation "Return a new stack which has the value at the index position
+  substituting the old value."))
 
 
 (define-condition empty-stack-condition (error)
-  ((text :initarg :text :reader :text)))
+  ((method-name :initarg :method-name :reader method-name))
+  (:report
+   (lambda (stream condition)
+     (format stream "There is no ~A, only ZUUL" (method-name condition)))))
 
 (define-condition invalid-subscript (error)
   ((text :initarg :text :reader :text)))
 
 ;;; Implementation
 
-
-
-
 ;;; Stack
 
 (defclass stack ()
-  ((head :initarg :head :initform nil :reader head)
-   (tail :initarg :tail :initform nil :reader tail)))
+  ((head :initarg :head :initform +empty-stack+ :reader head)
+   (tail :initarg :tail :initform +empty-stack+ :reader tail)))
 
 (defmethod print-object ((obj stack) stream)
   "In order to help checking the results."
@@ -65,30 +70,22 @@
         (t (new-stack (head stack)
                       (update (tail stack) (- index 1) value)))))
 
-
-(defparameter +empty-stack+ (make-instance 'stack))
-
-(defmethod print-object ((obj (eql +empty-stack+)) stream)
-  "In order to help checking the results"
-  (format stream "Ø"))
-
-(defmethod empty-p ((stack (eql +empty-stack+)))
+(defmethod empty-p ((stack (eql 'empty-stack)))
   t)
 
-(defmethod head ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
+(defmethod head ((stack (eql 'empty-stack)))
+  (error 'empty-stack-condition :method 'head ))
 
-(defmethod tail ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :text "There is no tail, only ZUUL"))
+(defmethod tail ((stack (eql 'empty-stack)))
+  (error 'empty-stack-condition :method 'tail))
 
 (defmethod merge-stacks ((left-stack (eql +empty-stack+)) (right-stack stack))
-   right-stack)
-
+  right-stack)
 
 
 ;;; Exercise 2.1
 
-(defmethod suffixes ((stack stack))
+(defun suffixes (stack)
   (cond ((empty-p stack) (list stack))
         (t
          (append (list stack) (suffixes (tail stack))))))
