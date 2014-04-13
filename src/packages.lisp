@@ -20,6 +20,9 @@
   (:export
    #:argument-required))
 
+(defpackage :stack
+  (:use :cl :qpq))
+
 (defpackage :ordered
   (:use :cl)
   (:export #:ord-eql

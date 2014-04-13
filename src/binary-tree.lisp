@@ -143,5 +143,3 @@ when the list is of length 3 or less."
                                 output-img-file))
         (find-file ,output-img-file)
         t))))
-
-;; (member 4 (binary-tree 3 2 0 6 4))
