@@ -1,20 +1,5 @@
 (in-package :cl-user)
 
-(defpackage :pfds
-  (:use :cl :anaphora)
-  (:export #:merge-stacks
-           #:update
-           #:+empty-stack+
-           #:new-stack
-           #:make-counter
-           #:member?
-           #:new-node
-           #:+empty-node+
-           #:node
-           #:element
-           #:less-than
-           #:more-than))
-
 (defpackage :pfds-utils
   (:use :cl)
   (:export
@@ -63,3 +48,8 @@
   (:export #:color
            #:balance
            #:+empty-node+))
+
+
+(uiop/package:define-package :pfds
+  (:use :cl :ordered :stack :binary-tree :leftist-heap :red-black-tree)
+  (:reexport :ordered :stack :binary-tree :leftist-heap :red-black-tree))
