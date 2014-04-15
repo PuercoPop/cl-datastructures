@@ -16,11 +16,15 @@
 
 ;; Defining general methods on top of the specific ones.
 
-(defmethod ord-neql (pattern candidate)
-  (not (ord-eql pattern candidate)))
+(defgeneric ord-neql (pattern candidate)
+  (:documentation "Is pattern not equal to candidate?")
+  (:method (pattern candidate)
+    (not (ord-eql pattern candidate))))
 
-(defmethod ord-gt (pattern candidate)
-  (not (ord-leq pattern candidate)))
+(defgeneric ord-gt (pattern candidate)
+  (:documentation "Is the pattern greater than the candidate")
+  (:method (pattern candidate)
+    (not (ord-leq pattern candidate))))
 
 ;; Ordered for integers
 
