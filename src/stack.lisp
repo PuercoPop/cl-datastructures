@@ -4,7 +4,7 @@
 
 (defparameter +empty-stack+ 'empty-stack)
 
-(defmethod print-object ((obj (eql 'empty-stack)) stream)
+(defmethod print-object ((obj (eql +empty-stack+)) stream)
   "In order to help checking the results"
   (format stream "Ø"))
 
@@ -70,13 +70,13 @@
         (t (new-stack (head stack)
                       (update (tail stack) (- index 1) value)))))
 
-(defmethod empty-p ((stack (eql 'empty-stack)))
+(defmethod empty-p ((stack (eql +empty-stack+)))
   t)
 
-(defmethod head ((stack (eql 'empty-stack)))
+(defmethod head ((stack (eql +empty-stack+)))
   (error 'empty-stack-condition :method 'head ))
 
-(defmethod tail ((stack (eql 'empty-stack)))
+(defmethod tail ((stack (eql +empty-stack+)))
   (error 'empty-stack-condition :method 'tail))
 
 (defmethod merge-stacks ((left-stack (eql +empty-stack+)) (right-stack stack))
