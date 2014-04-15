@@ -32,7 +32,7 @@
            #:ord-gt))
 
 (defpackage :binary-tree
-  (:use :cl :ordered :pfds-utils)
+  (:use :cl :ordered :pfds-utils :qpq)
   (:import-from :anaphora
                 :aif
                 :it)

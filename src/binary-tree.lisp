@@ -21,9 +21,23 @@
   ((element :initarg :element
             :initform (error 'argument-required :argument-name 'element)
             :reader element)
-   (left-branch :initarg :left :initform +empty-node+ :reader left-branch)
-   (right-branch :initarg :right :initform +empty-node+ :reader right-branch)))
+   (left-branch :initarg :left :initform 'empty-node :reader left-branch)
+   (right-branch :initarg :right :initform 'empty-node :reader right-branch))
+  (:metaclass contracted-class)
+  (:invariants
+   (lambda (obj)
+     "Any given node is greater than each element in the left branch"
+     (implies (not (eql +empty-node+ (left-branch obj))) 
+              (ord-lt (element (left-branch obj))
+                      (element obj))))
+   (lambda (obj)
+     "Any given node is less than each element in the right branch."
+     (implies (not (eql +empty-node+ (right-branch obj))) 
+               (ord-gt (element (right-branch obj))
+                       (element obj))))))
 
+(defmethod element ((object (eql +empty-node+)))
+  +empty-node+)
 
 (defmethod member? (element (node node) &optional candidate)
   (if (ord-leq element (element node))
@@ -69,9 +83,11 @@
                          (right +empty-node+))
   "Properly construct a new node."
 
-  (unless (eql left +empty-node+)
+  (unless (or (eq (class-of left) (find-class 'node)) 
+              (eql left +empty-node+))
     (setf left (new-node left)))
-  (unless (eql right +empty-node+)
+  (unless  (or (eq (class-of left) (find-class 'node))
+               (eql right +empty-node+))
     (setf right (new-node right)))
 
   (make-instance 'node
@@ -85,32 +101,44 @@ left branch the result of the recursively applying the same procedure on the
 elements less than the mean and viceversa for the right branch. The base case
 when the list is of length 3 or less."
   (let ((values (sort (remove-duplicates values) #'<)))
-    (labels ((r-helper (&rest r-values)
-               (let* ((r-values (apply #'append r-values)) ; Nested rest needs to be spliced
-                      (length (length r-values))
-                      (median (floor (/ length 2))))
-                 (cond ((= length 3)
-                        (new-node (second r-values)
-                                  :left (first r-values)
-                                  :right (third r-values)))
-                       ((= length 2)
-                        (new-node (second r-values)
-                                  :left (first r-values)))
-                       ((= length 1)
-                        (new-node (first r-values)))
-                       (t (new-node (nth median r-values)
-                                    :left (r-helper
-                                           (subseq r-values 0 median))
-                                    :right (r-helper
-                                            (subseq r-values (1+ median)))) )))))
-      (r-helper values))))
+    (%binary-tree values)))
+
+(defun %binary-tree  (&rest r-values)
+  (let* ((r-values (apply #'append r-values)) ; Nested rest needs to be spliced
+         (length (length r-values))
+         (median (floor (/ length 2))))
+    (cond ((= length 3)
+           (new-node (second r-values)
+                     :left (first r-values)
+                     :right (third r-values)))
+          ((= length 2)
+           (new-node (second r-values)
+                     :left (first r-values)))
+          ((= length 1)
+           (new-node (first r-values)))
+          (t (new-node (nth median r-values)
+                       :left (%binary-tree
+                              (subseq r-values 0 median))
+                       :right (%binary-tree
+                               (subseq r-values (1+ median)))) ))))
+
+(defmethod print-object ((obj node) stream)
+  (print-unreadable-object (obj stream :type t)
+    (format stream "NODE: ~A Left: ~A, Right: ~A"
+            (element obj)
+            (if (eql (class-of obj) (class-of (left-branch obj)))
+                (element (left-branch obj))
+                "Ø"
+                )
+            (if (eql (class-of obj) (class-of (right-branch obj)))
+                (element (right-branch obj))
+                "Ø"
+                ))))
 
 (defmethod print-object ((obj (eql +empty-node+)) stream)
   "In order to help checking the results"
   (format stream "Ø"))
 
-;; (defmethod element ((node (eql +empty-node+)))
-;;   "Ø")
 
 #+sbcl
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
