@@ -5,22 +5,7 @@
     )
 (in-suite ch02)
 
-(test merge-stacks ()
-      (is (pfds:merge-stacks (new-stack 2 (new-stack 1 +empty-stack+))
-                             (new-stack 4 (new-stack 3 +empty-stack+)))
-          (new-stack 2 (new-stack  1 (new-stack 4 (new-stack 3 +empty-stack+))))))
 
-
-(test update ()
-      (is
-       (new-stack 1 (new-stack 10 (new-stack 10 +empty-stack+)))
-       (pfds:update
-        (new-stack 1 (new-stack 2 (new-stack 10 +empty-stack+)))
-        1
-        10)))
-
-;; (empty-p (tail (new-stack 1 (new-stack 2 (new-stack 10 (make-instance 'empty-stack))))))
-;; (tail (new-stack 1 (new-stack 2 (new-stack 10 (make-instance 'empty-stack)))))
 
 ;; (new-stack 3 (new-stack 1 (new-stack 2 (make-instance 'empty-stack))))
 ;; (trace suffixes)
