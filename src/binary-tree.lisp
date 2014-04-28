@@ -15,6 +15,7 @@
   (:documentation "Return a new tree, with the element inserted. If the node already exists then return the same there."))
 
 
+
 (defparameter +empty-node+ 'empty-node)
 
 (defclass node ()
@@ -26,12 +27,14 @@
   (:metaclass contracted-class)
   (:invariants
    (lambda (obj)
-     "Any given node is greater than each element in the left branch"
+     "Any given node is greater than each element in the left branch."
+     (declare (debug 3))
      (implies (not (eql +empty-node+ (left-branch obj))) 
               (ord-lt (element (left-branch obj))
                       (element obj))))
    (lambda (obj)
      "Any given node is less than each element in the right branch."
+     (declare (debug 3))
      (implies (not (eql +empty-node+ (right-branch obj))) 
                (ord-gt (element (right-branch obj))
                        (element obj))))))
@@ -66,6 +69,9 @@
      nil)
     (t node)))
 
+(defmethod empty? (node)
+  nil)
+
 (defmethod empty? ((node (eql +empty-node+)))
   t)
 
@@ -83,10 +89,12 @@
                          (right +empty-node+))
   "Properly construct a new node."
 
-  (unless (or (eq (class-of left) (find-class 'node)) 
+  (unless (or (eq (class-of left)
+                  (find-class 'node)) 
               (eql left +empty-node+))
     (setf left (new-node left)))
-  (unless  (or (eq (class-of left) (find-class 'node))
+  (unless  (or (eq (class-of right)
+                   (find-class 'node))
                (eql right +empty-node+))
     (setf right (new-node right)))
 
@@ -107,14 +115,14 @@ when the list is of length 3 or less."
   (let* ((r-values (apply #'append r-values)) ; Nested rest needs to be spliced
          (length (length r-values))
          (median (floor (/ length 2))))
-    (cond ((= length 3)
+    (cond ((eql length 3)
            (new-node (second r-values)
                      :left (first r-values)
                      :right (third r-values)))
-          ((= length 2)
+          ((eql length 2)
            (new-node (second r-values)
                      :left (first r-values)))
-          ((= length 1)
+          ((eql length 1)
            (new-node (first r-values)))
           (t (new-node (nth median r-values)
                        :left (%binary-tree
@@ -139,6 +147,8 @@ when the list is of length 3 or less."
   "In order to help checking the results"
   (format stream "Ø"))
 
+
+;; Utils
 
 #+sbcl
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
@@ -171,3 +181,15 @@ when the list is of length 3 or less."
                                 output-img-file))
         (find-file ,output-img-file)
         t))))
+
+(defun tree-depth (root)
+  )
+
+(defun tree-span (root)
+  ""
+  (labels ((follow-path (root accessor)
+             (if (empty? (funcall accessor root))
+                 0
+                 (+ 1 (follow-path (funcall accessor root) accessor)))))
+  (+ (follow-path root #'left-branch)
+     (follow-path root #'right-branch))))
