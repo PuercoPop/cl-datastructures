@@ -10,6 +10,7 @@
   :pathname "src/"
   :depends-on (#:anaphora
                #:quid-pro-quo)
+               #:closer-mop
   :components ((:file "packages")
                (:file "utils")
                (:file "ordered")

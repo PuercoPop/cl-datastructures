@@ -16,23 +16,6 @@
            #:ord-neql
            #:ord-gt))
 
-(defpackage :binary-tree
-  (:use :cl :ordered :pfds-utils :qpq)
-  (:import-from :anaphora
-                :aif
-                :it)
-  (:export #:node
-           #:insert
-           #:member?
-           #:+empty-node+
-           #:empty?
-           #:new-node
-           #:binary-tree
-           #:tree-to-dotgraph
-           #:element
-           #:left-branch
-           #:right-branch))
-
 (defpackage :leftist-heap
   (:use :cl :binary-tree :ordered :qpq)
   (:export #:s-value

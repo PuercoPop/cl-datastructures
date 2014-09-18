@@ -1,3 +1,24 @@
+(defpackage :binary-tree
+  (:use :cl :ordered :pfds-utils :qpq)
+  (:import-from :anaphora
+                :aif
+                :it)
+  (:import-from :closer-mop
+                :compute-class-precedence-list)
+  (:export #:node
+           #:insert
+           #:member?
+           #:+empty-node+
+           #:empty?
+           #:new-node
+           #:binary-tree
+           #:tree-to-dotgraph
+           #:element
+           #:left-branch
+           #:right-branch
+           #:tree-depth
+           #:tree-span))
+
 (in-package :binary-tree)
 
 ;; Nodes
@@ -85,16 +106,14 @@
 
 ;; Constructors & helpers
 
-(defun new-node (value &key (left +empty-node+)
-                         (right +empty-node+))
+(defun new-node (value &key (left +empty-node+) (right +empty-node+))
   "Properly construct a new node."
-
-  (unless (or (eq (class-of left)
-                  (find-class 'node)) 
+  (unless (or (member (find-class 'node)
+                      (compute-class-precedence-list (class-of left)))
               (eql left +empty-node+))
     (setf left (new-node left)))
-  (unless  (or (eq (class-of right)
-                   (find-class 'node))
+  (unless  (or (member (find-class 'node)
+                       (compute-class-precedence-list (class-of right)))
                (eql right +empty-node+))
     (setf right (new-node right)))
 
@@ -183,7 +202,10 @@ when the list is of length 3 or less."
         t))))
 
 (defun tree-depth (root)
-  )
+  ""
+  (cond ((empty? root) 0)
+        (t (1+ (max (tree-depth (left-branch root))
+                     (tree-depth (right-branch root)))))))
 
 (defun tree-span (root)
   ""
