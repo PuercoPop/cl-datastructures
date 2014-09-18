@@ -29,11 +29,11 @@
   substituting the old value."))
 
 
-(define-condition empty-stack-condition (error)
-  ((method-name :initarg :method-name :reader method-name))
+(define-condition empty-stack-condition (error) ()
   (:report
-   (lambda (stream condition)
-     (format stream "There is no ~A, only ZUUL" (method-name condition)))))
+   (lambda (condition stream)
+     (declare (ignore condition))
+     (format stream "The stack is empty."))))
 
 (define-condition invalid-subscript (error)
   ((text :initarg :text :reader :text)))
@@ -57,7 +57,6 @@
 (defmethod new-stack (head tail)
   (make-instance 'stack :head head :tail tail))
 
-
 (defmethod merge-stacks ((left-stack stack) (right-stack stack))
   (new-stack
    (head left-stack)
@@ -74,10 +73,10 @@
   t)
 
 (defmethod head ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :method 'head ))
+  (error 'empty-stack-condition))
 
 (defmethod tail ((stack (eql +empty-stack+)))
-  (error 'empty-stack-condition :method 'tail))
+  (error 'empty-stack-condition))
 
 (defmethod merge-stacks ((left-stack (eql +empty-stack+)) (right-stack stack))
   right-stack)
