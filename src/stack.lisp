@@ -21,7 +21,8 @@
 
 (defmethod print-object ((obj (eql +empty-stack+)) stream)
   "In order to help checking the results"
-  (format stream "Ø"))
+  (print-unreadable-object (obj stream :type t)
+      (format stream "Ø")))
 
 (defgeneric empty-p (stack)
   (:documentation "True if stack is empty."))
@@ -30,10 +31,12 @@
   (:documentation "Take two stacks and return a new stack."))
 
 (defgeneric head (stack)
-  (:documentation "Return the head of the stack, raise empty if stack is empty."))
+  (:documentation "Return the head of the stack, raise empty if stack is
+  empty."))
 
 (defgeneric tail (stack)
-  (:documentation "Return the tail of the stack, raise empty if stack is empty."))
+  (:documentation "Return the tail of the stack, raise empty if stack is
+  empty."))
 
 (defgeneric merge-stacks (left-stack right-stack)
   (:documentation "Return a new stack which contains the elements of both
@@ -63,7 +66,8 @@
 
 (defmethod print-object ((obj stack) stream)
   "In order to help checking the results."
-  (format stream "(~A, ~A)" (head obj) (tail obj)))
+  (print-unreadable-object (obj stream :type t :identity t)
+    (format stream "(~A, ~A)" (head obj) (tail obj))))
 
 
 (defmethod empty-p ((stack stack))
@@ -108,12 +112,25 @@
 
 ;;; Extra
 
-(defmethod transverse-stack ((stack stack))
-  (cond ((empty-p stack) (format t "~A~%" stack))
+(defun traverse-stack (stack &optional fn result-accumulator)
+  (cond ((empty-p stack) (format t "~A~%" stack) result-accumulator)
         (t (format t "~A~%" stack)
-           (transverse-stack (tail stack)))))
+           (when fn
+             (push (funcall fn stack) result-accumulator))
+           (traverse-stack (tail stack) fn result-accumulator))))
 
-(defmethod copy-stack ((stack stack))
+(defun copy-stack (stack)
   (cond ((empty-p stack) stack)
         (t (new-stack (head stack)
                       (copy-stack (tail stack))))))
+
+(defun stack-equal (s1 s2)
+  (let ((other s2))
+    (every #'identity
+           (traverse-stack s1
+                           (lambda (s)
+                             (prog1 (cond
+                                      ((or (empty-p s) (empty-p other)) nil)
+                                      (t (ordered:ord-eql (head s)
+                                                          (head other))))
+                                  (setf other (tail other))))))))
