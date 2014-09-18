@@ -1,3 +1,11 @@
+(defpackage :ordered
+  (:use :cl)
+  (:export #:ord-eql
+           #:ord-lt
+           #:ord-leq
+           #:ord-neql
+           #:ord-gt))
+
 (in-package :ordered)
 
 ;; So as to not make all the datastructures depend on integers a

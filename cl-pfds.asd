@@ -20,10 +20,11 @@
 
 (asdf:defsystem #:cl-pfds-tests
   :depends-on (#:cl-pfds
-               #:fiveam)
+               #:fiasco)
   :serial t
   :pathname "tests/"
   :components ((:file "packages")
+               (:file "ordered")
                (:file "ch02-tests")
                (:file "binary-tree")
                (:file "runner")))
@@ -31,4 +32,4 @@
 (defmethod asdf:perform ((op asdf:test-op)
                          (system (eql (asdf:find-system :cl-pfds))))
   (asdf:load-system :cl-pfds-tests)
-  (asdf/package:symbol-call :cl-pfds 'runner))
+  (asdf/package:symbol-call :pfds-tests 'runner))
