@@ -169,7 +169,7 @@ when the list is of length 3 or less."
 
 ;; Utils
 
-#+sbcl
+#+(and sbcl swank)
 (defmethod tree-to-dotgraph ((root node) &optional (output-file #P"~/tree.dot"))
   "Write graphivz's dot file for the tree."
   ;; If specify root to both branch. If node is not +empty-node+ recur.
