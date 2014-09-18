@@ -9,14 +9,16 @@
   :license "<3"
   :pathname "src/"
   :depends-on (#:anaphora
-               #:quid-pro-quo)
                #:closer-mop
-  :components ((:file "packages")
-               (:file "utils")
+               #:quid-pro-quo
+               #:optima)
+  :components ((:file "utils")
                (:file "ordered")
                (:file "stack")
                (:file "binary-tree")
-               (:file "leftist-heap")))
+               (:file "leftist-heap")
+               #+nil(:file "red-black-tree")
+               (:file "packages")))
 
 (asdf:defsystem #:cl-pfds-tests
   :depends-on (#:cl-pfds
@@ -25,6 +27,7 @@
   :pathname "tests/"
   :components ((:file "packages")
                (:file "ordered")
+               (:file "stack")
                (:file "ch02-tests")
                (:file "binary-tree")
                (:file "runner")))

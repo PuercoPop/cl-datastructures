@@ -15,10 +15,12 @@
   (:documentation "Takes to heaps and returned the merged heap."))
 
 (defgeneric find-min (heap)
-  (:documentation "Returns the minium element of the heap, raises Empty exception if empty."))
+  (:documentation "Returns the minium element of the heap, raises Empty
+  exception if empty."))
 
 (defgeneric delete-min (heap)
-  (:documentation "Delete the minium element of the heap, raises Empty exception if empty."))
+  (:documentation "Delete the minium element of the heap, raises Empty
+  exception if empty."))
 
 (defgeneric rank (node)
   (:documentation "The length of the rightmost path to an empty node."))
@@ -27,17 +29,30 @@
   (:documentation "Calcuate the S-value of the node, which is the
   minimum distance to a leaf (empty-node)."))
 
-(defgeneric check-invariants (heap)
-  (:documentation "Check the invariants of data structures."))
-
 
 ;; Implementaton
 
 (defclass leftist-node (node)
   ((rank :documentation "The distance to a childless node (empty node).")
-   (s-value)))
+   (s-value))
+  (:metaclass contracted-class)
+  (:invariants
+   (lambda (instance)
+     "The path to a leaf is shorter when transversing the right branch."
+     (implies (empty? instance)
+       (<= (rank (right-branch instance))
+           (rank (left-branch instance)))))
+   (lambda (instance)
+     "The values increase as the rank goes up."
+     (and
+      (implies (empty? (right-branch instance))
+        (ord-lte (element (right-branch instance))
+                 (element instance)))
+      (implies (empty? (left-branch instance))
+        (ord-lte (element (left-branch instance))
+                 (element instance)))))))
 
-(defparameter +empty-heap+ (make-instance 'leftist-node)
+(defparameter +empty-heap+ 'empty-heap
   "The node to represent the empty leftist binary heap.")
 
 (define-condition empty-heap-conditon (error)
@@ -128,8 +143,6 @@
       (setf (slot-value node 's-value) (call-next-method))))
 
 (defmethod check-invariants ((node leftist-node))
-  "The path to a leaf is shorter when transversing the right branch
-And the values are increasing as the rank goes up."
   (and
    (<= (rank (right-branch node))
        (rank (left-branch node)))
@@ -142,12 +155,13 @@ And the values are increasing as the rank goes up."
 (defun heap-from-list (&rest values)
   "Eliminate duplicates, sort the list and insert by one the elements
   into a leftist heap."
-
   (let ((sorted-values (sort (remove-duplicates values) #'<)))
-    (labels ((iter (result xs)
-               (cond ((null xs) result)
-                     (t (iter (insert (car xs) result)
-                              (cdr xs))))))
-      (if (= 1 (length sorted-values))
-          (new-leftist-node (car sorted-values))
-          (iter (new-leftist-node (car sorted-values)) (cdr sorted-values))))))
+    (if (eql 1 (length sorted-values))
+        (new-leftist-node (car sorted-values))
+        (%heap-from-list (new-leftist-node (car sorted-values))
+                         (cdr sorted-values)))))
+
+(defun %heap-from-list (result xs)
+  (cond ((null xs) result)
+        (t (%heap-from-list (insert (car xs) result)
+                            (cdr xs)))))
