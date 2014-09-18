@@ -1,3 +1,10 @@
+(defpackage :red-black-tree
+  (:use :cl :binary-tree :ordered :qpq :optima)
+  (:import-from :closer-mop :compute-class-precedence-list)
+  (:export #:color
+           #:balance
+           #:+empty-node+))
+
 (in-package :red-black-tree)
 
 (defgeneric color (node)

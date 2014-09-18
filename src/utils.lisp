@@ -1,3 +1,8 @@
+(defpackage :pfds-utils
+  (:use :cl)
+  (:export
+   #:argument-required))
+
 (in-package :pfds-utils)
 
 (define-condition argument-required (error)

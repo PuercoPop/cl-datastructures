@@ -1,3 +1,18 @@
+(defpackage :stack
+  (:use :cl :qpq)
+  (:export
+   #:new-stack
+   #:empty-p
+   #:head
+   #:tail
+   #:merge-stacks
+   #:update
+   #:empty-stack-condition
+   #:invalid-subscript
+   #:+empty-stack+
+   #:traverse-stack
+   #:stack-equal))
+
 (in-package :stack)
 
 ;;; Interface
