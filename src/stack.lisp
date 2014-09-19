@@ -66,7 +66,7 @@
 
 (defmethod print-object ((obj stack) stream)
   "In order to help checking the results."
-  (print-unreadable-object (obj stream :type t :identity t)
+  (print-unreadable-object (obj stream :type t)
     (format stream "(~A, ~A)" (head obj) (tail obj))))
 
 
@@ -113,11 +113,10 @@
 ;;; Extra
 
 (defun traverse-stack (stack &optional fn result-accumulator)
-  (cond ((empty-p stack) (format t "~A~%" stack) result-accumulator)
-        (t (format t "~A~%" stack)
-           (when fn
-             (push (funcall fn stack) result-accumulator))
-           (traverse-stack (tail stack) fn result-accumulator))))
+  (when fn
+    (push (funcall fn stack) result-accumulator))
+  (cond ((empty-p stack) result-accumulator)
+        (t (traverse-stack (tail stack) fn result-accumulator))))
 
 (defun copy-stack (stack)
   (cond ((empty-p stack) stack)
@@ -130,7 +129,9 @@
            (traverse-stack s1
                            (lambda (s)
                              (prog1 (cond
-                                      ((or (empty-p s) (empty-p other)) nil)
+                                      ((and (empty-p s) (not (empty-p other))) nil)
+                                      ((and (empty-p other) (not (empty-p s))) nil)
+                                      ((and (empty-p s) (empty-p other)) t)
                                       (t (ordered:ord-eql (head s)
                                                           (head other))))
-                                  (setf other (tail other))))))))
+                               (unless (empty-p other) (setf other (tail other)))))))))

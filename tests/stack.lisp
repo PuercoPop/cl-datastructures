@@ -24,6 +24,6 @@
        10)))
 
 (deftest empty-p-sanity ()
-  (is (not 
+  (is (not
        (empty-p (tail (new-stack 1 (new-stack 2 (new-stack 10 'empty-stack)))))))
   (is (empty-p +empty-stack+)))
