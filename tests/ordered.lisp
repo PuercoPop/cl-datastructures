@@ -1,6 +1,6 @@
-(fiasco:define-test-package :ordered-test
+(fiasco:define-test-package :ordered-tests
   (:use :cl :ordered))
-(in-package :ordered-test)
+(in-package :ordered-tests)
 
 (deftest ord-eql-sanity-check ()
   (let ((a 0)

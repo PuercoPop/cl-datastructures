@@ -1,10 +1,8 @@
-(in-package :pfds-tests)
+(fiasco:define-test-package :binary-tree-tests
+  (:use :cl :binary-tree))
+(in-package :binary-tree-tests)
 
-(def-suite binary-tree
-    :description "Binary tree tests.")
-(in-suite binary-tree)
-
-(test member? ()
+(deftest member?-sanity-test ()
       (let ((bt (binary-tree 3 2 0 6 4)))
         (is (member? 4 bt))
         (is (not (member? 7 bt)))))

@@ -28,7 +28,6 @@
   :components ((:file "packages")
                (:file "ordered")
                (:file "stack")
-               (:file "ch02-tests")
                (:file "binary-tree")
                (:file "runner")))
 

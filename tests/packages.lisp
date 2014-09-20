@@ -1,4 +1,4 @@
 (defpackage :pfds-tests
-  (:use :cl :pfds :fiveam)
+  (:use :cl)
   (:export
    #:runner))
